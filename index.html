@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>User Certification Quiz Editor</title>
+    
+    <!-- bootstrap -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+    <!-- Font Awesome icons (Bootstrap, Foundation, and jQueryUI also supported) -->
+    <link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.css'>
+    <script src="jsoneditor.min.js"></script>
+    
+    <script>
+    // Set the default CSS theme and icon library globally
+    JSONEditor.defaults.theme = 'bootstrap3';
+    JSONEditor.defaults.iconlib = 'fontawesome4';
+    </script>
+  </head>
+  <body style="margin:20px;">
+    
+    <div class='row'>
+      <div class='col-xs-12'>
+        <h1>User Certification Quiz Editor</h1>
+        <h5>Step 1: Load current Certification Quiz file.</h5>
+        <input type="file" id="file-input" />
+        <h5>Step 2: Edit values below.</h5>
+        <h5>Step 3: Click a Finish button (on the bottom of the screen) to copy the updated JSON into your clipboard.</h5>
+      </div>
+    </div>
+    <hr />
+    <div class='row'>
+      <div class='col-xs-12 panel'> 
+        <h3>The Quiz <span id='valid_indicator' class='label label-success'></span></h3>
+        
+        <div id='editor_holder'></div>
+      </div>
+    </div>
+    <div class='row'>
+      <div class='col-xs-12'>
+        <button id='submit' class='btn btn-primary btn-lg'>Finish - Copy to clipboard</button>
+      </div>
+    </div>
+    
+    <script>
+      // Initialize the editor
+      var editor = new JSONEditor(document.getElementById('editor_holder'),{
+        // Enable fetching schemas via ajax
+        ajax: true,
+        
+        // The schema for the editor
+        schema: {
+          $ref: "certification-quiz-schema.json",
+          format: "grid"
+        }
+      });
+      // On file selection, attempt to set the editor value
+      var openFile = function(event) {
+        var input = event.target;
+
+        var reader = new FileReader();
+        reader.onload = function(){
+          var text = reader.result;
+          editor.setValue(JSON.parse(text));
+        };
+        reader.readAsText(input.files[0]);
+      };
+      var copyTextToClipboard = function(text) {
+          var textArea = document.createElement("textarea");
+
+          //
+          // *** This styling is an extra step which is likely not required. ***
+          //
+          // Why is it here? To ensure:
+          // 1. the element is able to have focus and selection.
+          // 2. if element was to flash render it has minimal visual impact.
+          // 3. less flakyness with selection and copying which **might** occur if
+          //    the textarea element is not visible.
+          //
+          // The likelihood is the element won't even render, not even a flash,
+          // so some of these are just precautions. However in IE the element
+          // is visible whilst the popup box asking the user for permission for
+          // the web page to copy to the clipboard.
+          //
+
+          // Place in top-left corner of screen regardless of scroll position.
+          textArea.style.position = 'fixed';
+          textArea.style.top = 0;
+          textArea.style.left = 0;
+
+          // Ensure it has a small width and height. Setting to 1px / 1em
+          // doesn't work as this gives a negative w/h on some browsers.
+          textArea.style.width = '2em';
+          textArea.style.height = '2em';
+
+          // We don't need padding, reducing the size if it does flash render.
+          textArea.style.padding = 0;
+
+          // Clean up any borders.
+          textArea.style.border = 'none';
+          textArea.style.outline = 'none';
+          textArea.style.boxShadow = 'none';
+
+          // Avoid flash of white box if rendered for any reason.
+          textArea.style.background = 'transparent';
+
+
+          textArea.value = text;
+
+          document.body.appendChild(textArea);
+
+          textArea.select();
+
+          try {
+            var successful = document.execCommand('copy');
+            var msg = successful ? 'successful' : 'unsuccessful';
+            console.log('Copying text command was ' + msg);
+          } catch (err) {
+            console.log('Oops, unable to copy');
+          }
+
+          document.body.removeChild(textArea);
+      }
+        
+      var outputJson = function() {
+        copyTextToClipboard(JSON.stringify(editor.getValue()));
+        console.log(JSON.stringify(editor.getValue()));
+      };
+
+      // Hook up the submit buttons to log to the console
+      document.getElementById('submit').addEventListener('click', outputJson);
+
+      // Hook up the load file button
+      document.getElementById('file-input').addEventListener('change', openFile, false);
+      
+      // Hook up the validation indicator to update its 
+      // status whenever the editor changes
+      editor.on('change',function() {
+        // Get an array of errors from the validator
+        var errors = editor.validate();
+        
+        var indicator = document.getElementById('valid_indicator');
+        
+        // Not valid
+        if(errors.length) {
+          indicator.className = 'label label-danger';
+          indicator.textContent = 'not valid';
+        }
+        // Valid
+        else {
+          indicator.className = 'label label-success';
+          indicator.textContent = 'valid';
+        }
+      });
+    </script>
+  </body>
+</html>

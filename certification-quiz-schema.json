@@ -1,0 +1,129 @@
+{
+  "id": "org.sagebionetworks.repo.model.quiz.Quiz",
+  "description": "Schema for a quiz and, optionally, its answer key",
+  "name": "Quiz",
+  "properties": {
+    "id": {
+      "description": "the ID of this Quiz",
+      "links": [
+        {
+          "rel": "describedby",
+          "href": "http://synapse.sagebase.org/access/public"
+        }
+      ],
+      "type": "integer"
+    },
+    "header": {
+      "description": "Content preceding the series of questions",
+      "links": [
+        {
+          "rel": "describedby",
+          "href": "http://synapse.sagebase.org/access/public"
+        }
+      ],
+      "type": "string"
+    },
+    "questions": {
+      "items": {
+	  "id": "org.sagebionetworks.repo.model.quiz.MultichoiceQuestion",
+	  "description": "A multiple choice question",
+	  "name": "MultichoiceQuestion",
+	  "properties": {
+	    "questionIndex": {
+	      "description": "an index unique in the Quiz, used to refer to this question",
+	      "links": [
+	        {
+	          "rel": "describedby",
+	          "href": "http://synapse.sagebase.org/access/public"
+	        }
+	      ],
+	      "type": "integer"
+	    },
+	   	"prompt": {
+	      "description": "the user-readable prompt for this question",
+	      "links": [
+	        {
+	          "rel": "describedby",
+	          "href": "http://synapse.sagebase.org/access/public"
+	        }
+	      ],
+	      "type": "string"
+	    },
+	    "concreteType": {
+	      "type": "string"
+	    },
+	    "exclusive": {
+	      "description": "If true then only one response is correct",
+	      "links": [
+	        {
+	          "rel": "describedby",
+	          "href": "http://synapse.sagebase.org/access/public"
+	        }
+	      ],
+	      "type": "boolean"
+	    },
+	    "docLink": {
+	      "description": "Link to the document that contains information for background reading related to the question.",
+	      "type": "string"
+	    },
+	    "helpText": {
+	      "description": "A short text that provides a snippet of help to answer the question.",
+	      "type": "string"
+	    },
+	    "answers": {
+	      "items": {
+	        "id": "org.sagebionetworks.repo.model.quiz.MultichoiceAnswer",
+	        "description": "One of the multiple choices in a multiple choice question",
+	        "name": "MultichoiceAnswer",
+	        "properties": {
+	          "answerIndex": {
+	            "description": "An index unique within the scope the multiple choice question",
+	            "links": [
+	              {
+	                "rel": "describedby",
+	                "href": "http://synapse.sagebase.org/access/public"
+	              }
+	            ],
+	            "type": "integer"
+	          },
+	          "isCorrect": {
+	            "description": "True if and only if this is a correct response",
+	            "type": "boolean"
+	          },
+	          "prompt": {
+	            "description": "The user-readable prompt or label for this answer",
+	            "links": [
+	              {
+	                "rel": "describedby",
+	                "href": "http://synapse.sagebase.org/access/public"
+	              }
+	            ],
+	            "type": "string"
+	          }
+	        },
+	        "type": "object"
+	      },
+	      "description": "The possible answers for this question",
+	      "links": [
+	        {
+	          "rel": "describedby",
+	          "href": "http://synapse.sagebase.org/access/public"
+	        }
+	      ],
+	      "type": "array"
+	    }
+	  },
+	  "type": "object"
+	},
+      "description": "The questions in the Quiz",
+      "links": [
+        {
+          "rel": "describedby",
+          "href": "http://synapse.sagebase.org/access/public"
+        }
+      ],
+      "type": "array"
+    }
+  },
+  "type": "object"
+}
